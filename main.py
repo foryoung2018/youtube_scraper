@@ -73,8 +73,11 @@ def main():
         print(f"Downloaded: {path}")
 
     elif args.command == "best":
-        path = download_best(args.url, args.output)
-        print(f"Downloaded: {path}")
+        video_path, audio_path = download_best(args.url, args.output)
+        if video_path:
+            print(f"Video: {video_path}")
+        if audio_path:
+            print(f"Audio: {audio_path}")
 
     elif args.command == "search":
         results = search(args.query, args.max_results)

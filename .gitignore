@@ -1,0 +1,17 @@
+# Downloaded content
+dlw2023/
+drbergchinese/
+downloads/
+
+# Python
+__pycache__/
+*.pyc
+
+# Media files
+*.mp4
+*.webm
+*.mp3
+
+# OpenCode local config
+opencode.json
+.opencode/
