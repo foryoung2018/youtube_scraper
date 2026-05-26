@@ -6,6 +6,7 @@ import sys
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
+from youtube_scraper.discover import add_channel_to_author, discover_channels
 from youtube_scraper.downloader import download_audio, download_best, download_video
 from youtube_scraper.metadata import get_metadata
 from youtube_scraper.search import get_playlist, list_authors, list_channel_videos, search
@@ -37,7 +38,7 @@ def main():
     download_parser.add_argument("-a", "--audio", action="store_true", help="Download audio only (mp3)")
     download_parser.add_argument("-o", "--output", help="Output directory")
 
-    best_parser = sub.add_parser("best", help="Download video with highest quality (video+audio merged)")
+    best_parser = sub.add_parser("best", help="Download video+audio separately at highest quality")
     best_parser.add_argument("url", help="YouTube video URL")
     best_parser.add_argument("-o", "--output", help="Output directory")
 
@@ -58,6 +59,12 @@ def main():
     list_parser.add_argument("-f", "--file", default="author", help="Author file path (default: author)")
     list_parser.add_argument("-q", "--quick", action="store_true", help="Fast mode (less metadata, no view counts)")
     list_parser.add_argument("-v", "--verbose", action="store_true", help="Show enrichment details (member filtering, dates)")
+
+    discover_parser = sub.add_parser("discover", help="Discover new YouTube channels by describing your needs")
+    discover_parser.add_argument("query", help="Describe what kind of content/creators you're looking for")
+    discover_parser.add_argument("-n", "--max-results", type=int, default=10, help="Max recommendations (default: 10)")
+    discover_parser.add_argument("-a", "--add", nargs="*", metavar="N", type=int, help="Add recommended channels to author file (e.g. -a 1 3 to add #1 and #3)")
+    discover_parser.add_argument("-f", "--file", default="author", help="Author file path (default: author)")
 
     args = parser.parse_args()
 
@@ -103,6 +110,28 @@ def main():
                 print(f"\n{channel}:")
                 for r in videos:
                     print(_format_video(r))
+
+    elif args.command == "discover":
+        results = discover_channels(args.query, args.max_results)
+        if not results:
+            print("No matching channels found.")
+        else:
+            print(f"\nRecommendations for: {args.query}\n")
+            for i, r in enumerate(results, 1):
+                score = r.get("score", 0)
+                stars = "⭐" * min(int(score / 2) + 1, 5)
+                print(f"  [{i}] {r.get('handle', '?')}  {stars}")
+                print(f"      {r.get('title', '')}")
+                print(f"      {r.get('reason', '')}")
+                print()
+
+            if args.add is not None and len(args.add) > 0:
+                print("-" * 50)
+                for n in args.add:
+                    if 1 <= n <= len(results):
+                        handle = results[n - 1].get("handle", "")
+                        if handle:
+                            add_channel_to_author(handle, args.file)
     else:
         parser.print_help()
         sys.exit(1)

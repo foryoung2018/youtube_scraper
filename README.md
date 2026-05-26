@@ -133,6 +133,24 @@ python main.py best "URL" -o "./my_videos"
 python main.py playlist "https://www.youtube.com/playlist?list=..."
 ```
 
+### 智能发现博主
+
+用自然语言描述你想找的博主类型，通过 YouTube 搜索 + 大模型分析推荐匹配的频道：
+
+```bash
+python main.py discover "中文科技类博主，关注AI和编程" -n 10
+python main.py discover "医疗健康科普 中文" -n 5 -a 1 3
+```
+
+| 参数 | 说明 |
+| --- | --- |
+| `query` | 用自然语言描述你想找的博主类型 |
+| `-n, --max-results` | 最多推荐几条（默认 10） |
+| `-a, --add` | 将推荐的频道加入 author 文件（如 `-a 1 3` 添加第 1、3 个） |
+| `-f, --file` | author 文件路径（默认 `./author`） |
+
+> 需要配置大模型 API Key 才能获得智能分析（否则仅返回原始搜索结果）。
+
 ## 环境变量
 
 | 变量 | 默认值 | 说明 |
@@ -140,22 +158,32 @@ python main.py playlist "https://www.youtube.com/playlist?list=..."
 | `YT_OUTPUT_DIR` | `./downloads` | 下载输出目录 |
 | `YT_MAX_DOWNLOADS` | `5` | 搜索/频道默认最大结果数 |
 | `YT_TIMEOUT` | `30` | 请求超时（秒） |
+| `YT_DISCOVER_RESULTS` | `10` | discover 默认推荐数 |
+| `OPENAI_API_KEY` | — | 大模型 API Key（discover 智能分析必填） |
+| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | 大模型 API 地址 |
+| `OPENAI_MODEL` | `gpt-4o-mini` | 大模型名称 |
 
 ## 典型用法
 
 ```bash
-# 1. 浏览所有监听博主的最新内容
+# 1. 智能发现新博主（需配置 OPENAI_API_KEY）
+python main.py discover "中文AI科技博主" -n 10
+
+# 2. 将推荐的博主加入监听列表
+python main.py discover "医疗科普 中文" -n 5 -a 1 2
+
+# 3. 浏览所有监听博主的最新内容
 python main.py list -n 5 -v
 
-# 2. 搜索某博主频道
+# 4. 搜索某博主频道
 python main.py channel "@drbergchinese" -n 5 -d
 
-# 3. 下载感兴趣的某个视频
+# 5. 下载感兴趣的某个视频
 python main.py download "https://www.youtube.com/watch?v=xxx" -o "./drbergchinese"
 
-# 4. 最高画质下载
+# 6. 最高画质下载（视频和音频分开）
 python main.py best "https://www.youtube.com/watch?v=xxx"
 
-# 5. 只下音频
+# 7. 只下音频
 python main.py download -a "https://www.youtube.com/watch?v=xxx"
 ```
