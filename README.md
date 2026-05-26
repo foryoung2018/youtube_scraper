@@ -138,8 +138,21 @@ python main.py playlist "https://www.youtube.com/playlist?list=..."
 用自然语言描述你想找的博主类型，通过 YouTube 搜索 + 大模型分析推荐匹配的频道：
 
 ```bash
+# 智能搜索（需先配置大模型 API Key，见环境变量）
+python main.py discover "医疗健康科普 中文 医生 疾病预防" -n 5
+python main.py discover "财经投资 股市分析 中文" -n 5
 python main.py discover "中文科技类博主，关注AI和编程" -n 10
-python main.py discover "医疗健康科普 中文" -n 5 -a 1 3
+
+# 把推荐的频道加入监听列表
+python main.py discover "医疗科普" -n 5 -a 1 3
+```
+
+**提示词建议** — 描述越具体结果越精准：
+```
+"类型 语言 关键词1 关键词2..."
+
+好的: "中文科技博主 AI大模型 编程"  "医疗科普 中医 疾病预防 养生"
+差的: "找博主"  "好玩"
 ```
 
 | 参数 | 说明 |
@@ -149,7 +162,8 @@ python main.py discover "医疗健康科普 中文" -n 5 -a 1 3
 | `-a, --add` | 将推荐的频道加入 author 文件（如 `-a 1 3` 添加第 1、3 个） |
 | `-f, --file` | author 文件路径（默认 `./author`） |
 
-> 需要配置大模型 API Key 才能获得智能分析（否则仅返回原始搜索结果）。
+> **无需 API Key 也能用**，会展示频道名、订阅数、简介并按订阅数排序。
+> **配置大模型后**，获得 AI 评分（⭐）和中文推荐理由。
 
 ## 环境变量
 
@@ -159,9 +173,22 @@ python main.py discover "医疗健康科普 中文" -n 5 -a 1 3
 | `YT_MAX_DOWNLOADS` | `5` | 搜索/频道默认最大结果数 |
 | `YT_TIMEOUT` | `30` | 请求超时（秒） |
 | `YT_DISCOVER_RESULTS` | `10` | discover 默认推荐数 |
-| `OPENAI_API_KEY` | — | 大模型 API Key（discover 智能分析必填） |
-| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | 大模型 API 地址 |
-| `OPENAI_MODEL` | `gpt-4o-mini` | 大模型名称 |
+| `OPENAI_API_KEY` | — | 大模型 API Key（支持 OpenAI / DeepSeek 等） |
+| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | API 地址（DeepSeek: `https://api.deepseek.com/v1`） |
+| `OPENAI_MODEL` | `gpt-4o-mini` | 模型名（DeepSeek: `deepseek-chat`） |
+
+### 配置示例（PowerShell）
+
+```powershell
+# DeepSeek
+$env:OPENAI_API_KEY = "sk-xxx"
+$env:OPENAI_BASE_URL = "https://api.deepseek.com/v1"
+$env:OPENAI_MODEL = "deepseek-chat"
+
+# OpenAI
+$env:OPENAI_API_KEY = "sk-xxx"
+# BASE_URL 和 MODEL 用默认值即可
+```
 
 ## 典型用法
 
